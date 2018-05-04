@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- http://www.mybatis.org/mybatis-3/ko/getting-started.html의 '매핑된 SQL구문 살펴보기'에서 긁어온다. -->
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="org.jsp.mini.mapper.QuestionMapper">
+	<!-- resultMap -->
+	<resultMap type="question" id="questionMap">
+		<result column="qu_num" property="num"/>
+		<result column="qu_id" property="id"/>
+		<result column="qu_date" property="date"/>
+		<result column="qu_category" property="category"/>
+		<result column="qu_title" property="title"/>
+		<result column="qu_content" property="content"/>
+		<result column="qu_hits" property="hits"/>
+	</resultMap>
+	
+	<!-- 게시판 글목록 -->
+	<select id="selectQuestionList" parameterType="string" resultMap="questionMap">
+		select
+			*
+		from
+			question
+		where
+			qu_category = #{category}
+		order by
+			qu_num desc
+	</select>
+	
+	<!-- 게시판 글쓰기 -->
+	<insert id="insertQuestion" parameterType="question">
+		insert into question
+		(
+			qu_num
+			, qu_id
+			, qu_category
+			, qu_ability
+			, qu_title
+			, qu_content
+		)
+		values
+		(
+			qu_num_seq.nextval
+			, #{id}
+			, #{category}
+			, #{ability}
+			, #{title}
+			, #{content}
+		)
+	</insert>
+	
+	<!-- 게시판 글읽기 -->
+	<select id="selectQuestion" parameterType="int" resultMap="questionMap">
+		select
+			qu_num
+			, qu_id
+			, to_char(qu_date, 'yyyy/mm/dd') as qu_date
+			, qu_category
+			, qu_ability
+			, qu_title
+			, qu_content
+			, qu_hits
+		from
+			question
+		where
+			qu_num = #{num}
+	</select>
+	
+	<!-- 게시글 조회수 증가 -->
+	<update id="addHits" parameterType="int">
+		update
+			question
+		set
+			qu_hits = qu_hits + 1
+		where
+			qu_num = #{num}
+	</update>
+	
+	<!-- 게시판 글수정 -->
+	<select id="updateQuestion" parameterType="question">
+		update
+			question
+		set
+			qu_ability = #{ability}
+			, qu_title = #{title}
+			, qu_content = #{content}
+		where
+			qu_num = #{num}
+	</select>
+	
+	<!-- 게시판 글삭제 -->
+	<delete id="deleteQuestion" parameterType="int">
+		delete question
+		where qu_num = #{num}
+	</delete>
+	
+	
+</mapper>

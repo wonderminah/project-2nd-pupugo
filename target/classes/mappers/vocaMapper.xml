@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- http://www.mybatis.org/mybatis-3/ko/getting-started.html의 '매핑된 SQL구문 살펴보기'에서 긁어온다. -->
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="org.jsp.mini.mapper.VocaMapper">
+	<!-- vocaMap -->
+	<resultMap type="voca" id="vocaMap">
+		<result column="vo_num" property="num"/>
+		<result column="vo_id" property="id"/>
+		<result column="vo_date" property="date"/>
+		<result column="vo_inputtext" property="inputText"/>
+		<result column="vo_outputtext" property="outputText"/>
+	</resultMap>
+	
+	<!-- cateResultMap -->
+	<resultMap type="category" id="cateResultMap">
+		<result column="se_num" property="num"/>
+		<result column="se_name" property="name"/>
+		<result column="se_date" property="date"/>
+		<result column="se_id" property="id"/>
+	</resultMap>
+	<!-- 
+	<parameterMap id="searchVocaParameterMap" type="java.util.HashMap">
+	  <parameter property="id" jdbcType="VARCHAR" javaType="string"></parameter>
+	  <parameter property ="text" jdbcType="VARCHAR" javaType="string"></parameter>
+	</parameterMap>
+  	 -->
+  	 
+  	<!-- 카테고리 목록을 사이드메뉴로 불러오기 -->
+  	<select id="selectCategoryById" parameterType="string" resultMap="cateResultMap">
+  		select
+  			se_num
+  			, se_name
+  			, to_char(se_date, 'yyyy/mm/dd') as se_date
+  			, se_id
+  		from
+  			section
+  		where
+  			se_id = #{id}
+  	</select>
+  	 
+  	<!-- 번역결과 저장 -->
+ 	<insert id="addToNote" parameterType="voca">
+ 		insert into voca
+ 		(
+ 			vo_num
+ 			, vo_id
+ 			, vo_inputtext
+ 			, vo_outputtext
+ 		)
+ 		values
+ 		(
+ 			vo_num_seq.nextval
+ 			, #{id}
+ 			, #{inputText}
+ 			, #{outputText}
+ 		)
+ 	</insert>
+  
+  	<!-- 단어장 목록 개수 구하기 -->
+  	<select id="selectVocaCount" parameterType="string" resultType="int">
+  		select count (*)
+  		from voca
+  		where vo_id = #{id}
+  	</select>
+  
+  	<!-- 단어장 목록 가져오기 -->
+  	<select id="selectVocaList" parameterType="string" resultMap="vocaMap">
+  		select
+  			vo_num
+  			, vo_id
+  			, to_char(vo_date, 'yyyy/mm/dd') as vo_date
+  			, vo_inputtext
+  			, vo_outputtext
+  		from
+  			voca
+  		where
+  			vo_id = #{id}
+  		order by
+  			vo_num desc
+  	</select>
+  	
+  	<!-- 단어장 검색 -->
+  	<select id="searchVoca" parameterType="map" resultMap="vocaMap">
+  		select
+  			vo_num
+  			, vo_id
+  			, to_char(vo_date, 'yyyy/mm/dd') as vo_date
+  			, vo_inputtext
+  			, vo_outputtext
+  		from
+  			voca
+  		where
+  			vo_id = #{id}
+  			and 
+  			(vo_inputtext LIKE '%${text}%' or vo_outputtext LIKE '%${text}%')
+  	</select>
+  	
+  	<!-- 수정된 단어 꺼내와서 ajax로 바로 뿌리기 -->
+  	<select id="getModifiedVoca" parameterType="int" resultMap="vocaMap">
+  		select
+  			vo_num
+  			, vo_id
+  			, to_char(vo_date, 'yyyy/mm/dd') as vo_date
+  			, vo_inputtext
+  			, vo_outputtext
+  		from
+  			voca
+  		where
+  			vo_num = #{num}
+  	</select>
+  	
+  	<!-- 단어 수정결과 저장 -->
+  	<update id="saveVoca" parameterType="voca">
+		update
+			voca
+		set  
+			vo_inputtext = #{inputText}
+			, vo_outputtext = #{outputText}
+		where
+			vo_num = #{num}
+  	</update>
+  	
+  	<!-- 단어 삭제 -->
+  	<delete id="deleteVoca" parameterType="int">
+  		delete voca
+  		where vo_num = #{num}
+  	</delete>
+  	
+	<!-- 전체인원 단어 수 통계
+  	<select id="vocaCountOfAll" parameterType="int" resultType="int">
+  		select count(*)
+  		from voca
+  		where to_number(vo_date, 'yyyymmdd') = #{yyyymmdd}
+  	</select> -->
+  	
+  	<!-- 새 카테고리 만들기 -->
+  	<insert id="addNewCategory" parameterType="map">
+  		insert into section
+  		(
+  			se_num
+  			, se_name
+  			, se_id
+  		)
+  		values
+  		(
+  			se_num_seq.nextval
+  			, #{name}
+  			, #{id}
+  		)
+  	</insert>
+  	
+  	<!-- 해당 유저의 카테고리별 단어 출력 -->
+  	<select id="getVocaOfCategory" parameterType="map" resultMap="vocaMap">
+  		select
+  			vo_num
+  			, vo_id
+  			, to_char(vo_date, 'yyyy/mm/dd') as vo_date
+  			, vo_inputtext
+  			, vo_outputtext
+  		from
+  			voca
+  		where
+  			vo_num in
+  			(select vo_num
+  			 from sectionmap
+  			 where se_name = #{categoryName} and se_id = #{id})
+  	</select>
+  	
+  	<!-- 아이디별 일주일치 통계 -->
+  	<select id="getMyChart" parameterType="string" resultMap="vocaMap">
+  		select
+  			*
+  		from
+  			voca
+  		where
+  			vo_id = #{id}
+  			and
+  			vo_date between sysdate-6 and sysdate
+  	</select>
+  	
+  	<!-- 퀴즈에서 틀린 단어는 복습할 수 있도록 toreview를 1로 설정 -->
+  	<update id="checkToReview" parameterType="int">
+  		update voca
+  		set vo_toreview = 1
+  		where vo_num = #{num}
+  	</update>
+  	
+  	<!-- 복습할 단어만 다시 뽑기 -->
+  	<select id="getVocaToReview" parameterType="string" resultMap="vocaMap">
+  		select
+  			vo_num
+  			, vo_id
+  			, to_char(vo_date, 'yyyy/mm/dd') as vo_date
+  			, vo_inputtext
+  			, vo_outputtext
+  		from
+  			voca
+  		where
+  			vo_toreview = 1 and vo_id = ${id}
+  	</select>
+</mapper>

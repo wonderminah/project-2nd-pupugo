@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- http://www.mybatis.org/mybatis-3/ko/getting-started.html의 '매핑된 SQL구문 살펴보기'에서 긁어온다. -->
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="org.jsp.mini.mapper.AnswerMapper">
+	<!-- resultMap -->
+	<resultMap type="answer" id="answerMap">
+		<result column="an_num" property="num"/>
+		<result column="an_qunum" property="qunum"/>
+		<result column="an_id" property="id"/>
+		<result column="an_date" property="date"/>
+		<result column="an_category" property="category"/>
+		<result column="an_title" property="title"/>
+		<result column="an_content" property="content"/>
+		<result column="an_selected" property="selected"/>
+	</resultMap>
+
+	<!-- 답변쓰기 -->
+	<insert id="insertAnswer" parameterType="answer">
+		insert into Answer
+		(
+			an_num
+			, an_qunum
+			, an_id
+			, an_category
+			, an_title
+			, an_content
+		)
+		values
+		(
+			an_num_seq.nextval
+			, #{qunum}
+			, #{id}
+			, #{category}
+			, #{title}
+			, #{content}
+		)
+	</insert>
+
+	<!-- 답변읽기 -->
+	<select id="selectAnswerList" parameterType="int" resultMap="answerMap">
+		select
+			an_num
+			, an_qunum
+			, an_id
+			, to_char(an_date, 'yyyy/mm/dd hh:mm:ss') as an_date
+			, an_category
+			, an_title
+			, an_content
+			, an_selected
+		from
+			answer
+		where
+			an_qunum = #{num}
+	</select>
+</mapper>

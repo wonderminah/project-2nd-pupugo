@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration 
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+  
+ <configuration>
+ <!-- 
+ 이제까지 해온것과 달리 스프링은 root-context.xml에 이미 추가가 되어있기 때문에
+ 여기에 기존의 것을 적을 필요가 없고
+ 알리아스를 주거나 매핑할 때에만 적으면 된다.
+ -->
+	<typeAliases>
+		<typeAlias type="org.jsp.mini.vo.Answer" alias="answer"></typeAlias>
+		<typeAlias type="org.jsp.mini.vo.Member" alias="member"></typeAlias>
+		<typeAlias type="org.jsp.mini.vo.Note" alias="note"></typeAlias>
+		<typeAlias type="org.jsp.mini.vo.Question" alias="question"></typeAlias>
+		<typeAlias type="org.jsp.mini.vo.Reply" alias="reply"></typeAlias>
+		<typeAlias type="org.jsp.mini.vo.Scrap" alias="scrap"></typeAlias>
+		<typeAlias type="org.jsp.mini.vo.Voca" alias="voca"></typeAlias>
+		<typeAlias type="org.jsp.mini.vo.Category" alias="category"></typeAlias>
+	</typeAliases>
+
+ 	
+ </configuration>

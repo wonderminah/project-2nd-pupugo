@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- http://www.mybatis.org/mybatis-3/ko/getting-started.html의 '매핑된 SQL구문 살펴보기'에서 긁어온다. -->
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="org.jsp.mini.mapper.MemberMapper">
+	<!-- resultMap -->
+	<resultMap type="member" id="memberMap">
+		<result column="mb_num" property="num"/>
+		<result column="mb_id" property="id"/>
+		<result column="mb_pw" property="pw"/>
+		<result column="mb_name" property="name"/>
+		<result column="mb_nick" property="nick"/>
+		<result column="mb_gender" property="gender"/>
+		<result column="mb_birth" property="birth"/>
+		<result column="mb_ability" property="ability"/>
+		<result column="mb_interest" property="interest"/>
+	</resultMap>
+
+	<!-- 회원가입 -->
+	<insert id="insertMember" parameterType="member">
+		insert into member
+		(
+			mb_num
+			, mb_id
+			, mb_pw
+			, mb_name
+			, mb_nick
+			, mb_gender
+			, mb_birth
+			<if test="interest != null">, mb_interest</if>
+		)
+		values
+		(
+			mb_num_seq.nextval
+			, #{id}
+			, #{pw}
+			, #{name}
+			, #{nick}
+			, #{gender}
+			, #{birth}
+			<if test="interest != null">, #{interest}</if> 
+		)
+	</insert>
+	
+	<update id="updateMember" parameterType="member">
+		update member
+		set mb_pw = #{pw}
+			, mb_name = #{name}
+			, mb_nick = #{nick}
+			, mb_gender = #{gender}
+			, mb_birth = #{birth}
+			<if test="interest != null">, mb_interest = #{interest}</if>
+		where mb_num = #{num}
+	</update>
+	
+	<!-- 아이디 중복확인 -->
+	<select id="checkId" parameterType="member" resultMap="memberMap">
+		select
+			*
+		from
+			member
+		where
+			mb_id = #{id}
+	</select>
+
+	<!-- 로그인 -->
+	<select id="loginMember" parameterType="map" resultMap="memberMap">
+		select
+			*
+		from
+			member
+		where
+			mb_id = #{id} and
+			mb_pw = #{pw}
+	</select>
+	
+	<delete id="deleteMember" parameterType="member">
+		delete member
+		where
+			mb_num = #{num}
+	</delete>
+</mapper>
